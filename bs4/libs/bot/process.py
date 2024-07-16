@@ -140,10 +140,10 @@ class BotScaper:
       productBasePrice = productPriceSale
 
     # DEBUG
-    print("---------- DEBUG ----------")
-    print(f'name: {productName}')
-    print(f'price sale: {productPriceSale}')
-    print(f'basePrice {productBasePrice}')
+    # print("---------- DEBUG ----------")
+    # print(f'name: {productName}')
+    # print(f'price sale: {productPriceSale}')
+    # print(f'basePrice {productBasePrice}')
 
     # SECTION 6 - WRITE TO FILE LIKE CSV
     writeToCsv(date, merchantName, productName, productPriceSale, productBasePrice, productUrl)
@@ -275,21 +275,62 @@ class BotScaper:
     productName = elementProductPanel.find_all("div")[0].find("h1").text.strip()
     productPriceSale = elementProductPanel.find_all("div")[2].find_all("div")[0].get_text(strip=True, separator="|").split("|")[1]
     productBasePrice = productPriceSale
-    print()
     try:
       productBasePrice = elementProductPanel.find_all("div")[2].find_all("div")[1].get_text(strip=True).replace("฿", "")
     except:
       pass
 
     # DEBUG
-    print("---------- DEBUG ----------")
-    print(f'name: {productName}')
-    print(f'price sale: {productPriceSale}')
-    print(f'basePrice {productBasePrice}')
+    # print("---------- DEBUG ----------")
+    # print(f'name: {productName}')
+    # print(f'price sale: {productPriceSale}')
+    # print(f'basePrice {productBasePrice}')
 
     # SECTION 6 - WRITE TO FILE LIKE CSV
     writeToCsv(date, merchantName, productName, productPriceSale, productBasePrice, productUrl)
 
 
-  # def processFreshket(self, url):
-  #   pass
+  def processFreshket(self, url):
+    print('processFreshket...')
+
+    # SECTION - 1/1 http req to link
+    # response = requests.get(url)
+    # content = response.content
+
+    # SECTION 1/2 - open browser and navigate to url wait then for page load
+    content = openChrome(url)
+
+    # SECTION 2 - parse content to beautifulsoup
+    soup = BeautifulSoup(content, "html.parser")
+
+    # SECTION 3 - write to file like html
+    writeToFile("index-freshket.html", soup.prettify())
+
+    # SECTION 4 - process from html file or content
+    soup = readContentFromFile("index-freshket.html")
+
+    # SECTION 5 - parse data
+    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    merchantName = "Freshket"
+    productName = ""
+    productPriceSale = ""
+    productBasePrice = ""
+    productUrl = url
+
+    elementProductPanel = soup.find("div", attrs={"role": "main"}).find("div", attrs={"data-testid": "page-content-root"}).find("h1").parent
+    productName = elementProductPanel.find("h1").text.strip()
+    productPriceSale = elementProductPanel.find("h5", attrs={"id": "price-value"}).text.strip()
+    productBasePrice = productPriceSale
+    try:
+      productBasePrice = elementProductPanel.find("span", attrs={"data-testid": "discount-original-price-label"}).get_text(strip=True, separator="|").split("|")[1]
+    except:
+      pass
+    
+    # DEBUG
+    # print("---------- DEBUG ----------")
+    # print(f'name: {productName}')
+    # print(f'price sale: {productPriceSale}')
+    # print(f'basePrice {productBasePrice}')
+
+    # SECTION 6 - WRITE TO FILE LIKE CSV
+    writeToCsv(date, merchantName, productName, productPriceSale, productBasePrice, productUrl)
