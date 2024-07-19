@@ -15,7 +15,7 @@ read csv to transform data add to database
 query database to do awesome
 '''
 
-f = open('bs4/dev_data.json')
+f = open('bs4/data.json')
 listData = json.load(f)
 f.close()
 
