@@ -244,8 +244,8 @@ class BotScaper:
     writeToCsv(date, merchantName, productName, productPriceSale, productBasePrice, productUrl)
 
     
-  def processLotoss(self, url):
-    print('processLotoss...')
+  def processLotuss(self, url):
+    print('processLotuss...')
 
     # SECTION - 1/1 http req to link
     # response = requests.get(url)

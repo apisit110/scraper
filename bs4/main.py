@@ -1,10 +1,3 @@
-# makro -> https://www.makro.co.th/
-# BigC -> https://www.bigc.co.th/
-# watsons -> https://www.watsons.co.th/
-# tops -> https://www.tops.co.th/
-# Lotus -> https://www.lotuss.com/th
-# multybeauty -> https://www.multybeauty.com
-
 from libs.bot.process import BotScaper
 import json
 
@@ -31,7 +24,7 @@ for item in listData:
     #   scaper.processWatsons(item['link'])
     elif item['merchant'] == "TOPS":
       scaper.processTops(item['link'])
-    elif item['merchant'] == "LOTOSS":
-      scaper.processLotoss(item['link'])
+    elif item['merchant'] == "LOTUSS":
+      scaper.processLotuss(item['link'])
     elif item['merchant'] == "freshket.co":
       scaper.processFreshket(item['link'])
