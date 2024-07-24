@@ -7,11 +7,17 @@ from datetime import datetime
 import time
 from pathlib import Path
 import os
+import json
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
+_path = os.path.join('bs4', 'libs', 'constants', 'merchant.json')
+f = open(_path, 'r')
+MERCHANT = json.load(f)
+f.close()
 
 def openChrome(url):
   options = webdriver.ChromeOptions()
@@ -76,7 +82,7 @@ class BotScaper:
 
     # SECTION 5 - parse data
     date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    merchantName = "Big C"
+    merchantName = MERCHANT['BIG_C']
     productName = ""
     productPriceSale = None
     productBasePrice = None
@@ -124,7 +130,7 @@ class BotScaper:
 
     # SECTION 5 - parse data
     date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    merchantName = "Makro pro"
+    merchantName = MERCHANT['MAKRO_PRO']
     productName = soup.find("div", attrs={'class': 'MuiBox-root css-13u9jxe'}).text.strip()
     productPriceSale = None
     productBasePrice = None
@@ -170,7 +176,7 @@ class BotScaper:
 
     # SECTION 5 - parse data
     date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    merchantName = "watsons"
+    merchantName = MERCHANT['WATSONS']
     productName = ""
     productPriceSale = ""
     productBasePrice = ""
@@ -220,7 +226,7 @@ class BotScaper:
 
     # SECTION 5 - parse data
     date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    merchantName = "Tops"
+    merchantName = MERCHANT["TOPS"]
     productName = ""
     productPriceSale = ""
     productBasePrice = ""
@@ -258,14 +264,14 @@ class BotScaper:
     soup = BeautifulSoup(content, "html.parser")
 
     # SECTION 3 - write to file like html
-    writeToFile("index-lotoss.html", soup.prettify())
+    writeToFile("index-lotuss.html", soup.prettify())
 
     # SECTION 4 - process from html file or content
-    soup = readContentFromFile("index-lotoss.html")
+    soup = readContentFromFile("index-lotuss.html")
 
     # SECTION 5 - parse data
     date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    merchantName = "Lotoss"
+    merchantName = MERCHANT["LOTUSS"]
     productName = ""
     productPriceSale = ""
     productBasePrice = ""
@@ -311,7 +317,7 @@ class BotScaper:
 
     # SECTION 5 - parse data
     date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    merchantName = "Freshket"
+    merchantName = MERCHANT['FRESHKET']
     productName = ""
     productPriceSale = ""
     productBasePrice = ""
