@@ -282,7 +282,7 @@ class BotScaper:
     productPriceSale = elementProductPanel.find_all("div")[2].find_all("div")[0].get_text(strip=True, separator="|").split("|")[1]
     productBasePrice = productPriceSale
     try:
-      productBasePrice = elementProductPanel.find_all("div")[2].find_all("div")[1].get_text(strip=True).replace("฿", "")
+      productBasePrice = elementProductPanel.find_all("div")[2].find_all("div")[1].get_text(strip=True).split("/")[0].replace("฿", "")
     except:
       pass
 
