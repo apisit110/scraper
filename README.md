@@ -29,7 +29,7 @@ How it work
 - Tops
   - [x] Web
 - Lotuss
-  - [ ] Web
+  - [x] Web
 - Freshket
   - [ ] Web
 - Multybeauty
