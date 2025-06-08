@@ -100,12 +100,14 @@ make start
 - หน้า product detail มีข้อมูลอยู่ใน tags script id คือ `wtcth-state`
 
 ### Tops
-
 เขียนด้วย Java?
 - หน้า product detail เข้าถึง ui element เพื่อดึงข้อมูล
 
 ### Lotuss
-
 เขียนด้วย Java? + rest api
 - หน้า product detail เราสามารถใช้ http get ได้เลยไม่ต้องเข้าถึง ui element ยิง api เส้น get product detail เพื่อดูรายละเอียดสินค้า
+
+### Freshket
+เขียนด้วย: Next.js + GraphQL
+- หน้า product detail เป็น ssr เราสามารถใช้ http get ได้เลยไม่ต้องเข้าถึง ui element ข้อมูลจะอยู่ใน tags script id คือ `__NEXT_DATA__`
 

@@ -426,44 +426,59 @@ class BotScaper:
   def processFreshket(self, url):
     print('processFreshket...')
 
-    # SECTION - 1/1 http req to link
-    # response = requests.get(url)
-    # content = response.content
+    isDebugFromExistingHTMLFile = False
+    if (isDebugFromExistingHTMLFile == False):
+      # SECTION - 1/1 http req to link
+      response = requests.get(url)
+      content = response.content
 
-    # SECTION 1/2 - open browser and navigate to url wait then for page load
-    content = openChrome(url)
+      # SECTION 1/2 - open browser and navigate to url wait then for page load
+      # content = openChrome(url)
 
-    # SECTION 2 - parse content to beautifulsoup
-    soup = BeautifulSoup(content, "html.parser")
+      # SECTION 2 - parse content to beautifulsoup
+      soup = BeautifulSoup(content, "html.parser")
 
-    # SECTION 3 - write to file like html
-    writeToFile("index-freshket.html", soup.prettify())
+      # SECTION 3 - write to file like html
+      writeToFile("freshket-product-detail.html", soup.prettify())
 
     # SECTION 4 - process from html file or content
-    soup = readContentFromFile("index-freshket.html")
+    soup = readContentFromFile("freshket-product-detail.html")
 
-    # SECTION 5 - parse data
-    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    merchantName = MERCHANT['FRESHKET']
-    productName = ""
-    productPriceSale = ""
-    productBasePrice = ""
-    productUrl = url
+    # SECTION 5 - EXTRACT
+    next_data_script = soup.find('script', id='__NEXT_DATA__')
+    if next_data_script:
+      json_data_str = next_data_script.string
+      try:
+        next_data_object = json.loads(json_data_str)
+        guid = escapeComma(str(next_data_object['props']['pageProps']['detail']['guid']))
+        name = escapeComma(str(next_data_object['props']['pageProps']['detail']['name']))
+        originalPrice = escapeComma(str(next_data_object['props']['pageProps']['detail']['sellingPrice']['originalPrice']))
+        price = escapeComma(str(next_data_object['props']['pageProps']['detail']['sellingPrice']['price']))
 
-    elementProductPanel = soup.find("div", attrs={"role": "main"}).find("div", attrs={"data-testid": "page-content-root"}).find("h1").parent
-    productName = elementProductPanel.find("h1").text.strip()
-    productPriceSale = elementProductPanel.find("h5", attrs={"id": "price-value"}).text.strip()
-    productBasePrice = productPriceSale
-    try:
-      productBasePrice = elementProductPanel.find("span", attrs={"data-testid": "discount-original-price-label"}).get_text(strip=True, separator="|").split("|")[1]
-    except:
-      pass
-    
-    # DEBUG
-    # print("---------- DEBUG ----------")
-    # print(f'name: {productName}')
-    # print(f'price sale: {productPriceSale}')
-    # print(f'basePrice {productBasePrice}')
-
-    # SECTION 6 - WRITE TO FILE LIKE CSV
-    writeToCsv(date, merchantName, productName, productPriceSale, productBasePrice, productUrl)
+        # SECTION 6 Load
+        fileName = "freshket_product_detail" + datetime.now().strftime("%Y%m%d") + "_000" + ".csv"
+        header = ','.join(
+          [
+            'createdAt',
+            'guid',
+            'name',
+            'originalPrice',
+            'price',
+            'url'
+          ]
+        ) + '\n'
+        content = ','.join(
+          [
+            datetime.now().isoformat(),
+            guid,
+            name,
+            originalPrice,
+            price,
+            url
+          ]
+        ) + '\n'
+        appendToFile(fileName, header, content)
+      except Exception as e:
+        print(f'An error occurred: ${e}')
+    else:
+      print("JSON script tag not found using regex.")
