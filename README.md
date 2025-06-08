@@ -27,14 +27,16 @@ How it work
 - Watsons
   - [ ] Web
 - Tops
-  - [x] Web
+  - [ ] Web
 - Lotuss
-  - [x] Web
+  - [ ] Web
 - Freshket
-  - [x] Web
+  - [ ] Web
 - Multybeauty
   - [ ] Web
 - Shopee
+  - [ ] Web
+- All ONLINE
   - [ ] Web
 
 
