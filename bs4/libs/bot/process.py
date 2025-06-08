@@ -19,6 +19,11 @@ f = open(_path, 'r')
 MERCHANT = json.load(f)
 f.close()
 
+def escapeComma(value):
+  if "," in value:
+    return '"' + value + '"'
+  return value
+
 def openChrome(url):
   options = webdriver.ChromeOptions()
   options.add_argument('--headless')  # If you want to run Chrome in headless mode
@@ -55,104 +60,202 @@ def writeToCsv(date, merchantName, productName, productPriceSale, productBasePri
   f.write(row)
   f.close()
 
+def appendToFile(fileName, header, content):
+  filePath = os.path.join("RawZone", fileName)
+  if Path(filePath).is_file() == False:
+    f = open(filePath, "w")
+    f.write(header)
+    f.close()
+
+  with open(filePath, "a") as f:
+    f.write(content)
+
+
 class BotScaper:
   # def __init__(self) -> None:
   #   pass
   def __init__(self):
     pass
 
-  def processBigC(self, url):
+  def processBigC(self, url, isFirstLoop):
     print('processBigC...')
+    
+    isDebugFromExistingHTMLFile = False
+    if (isDebugFromExistingHTMLFile == False):
+      # SECTION - 1/1 http req to link
+      if (isFirstLoop):
+        payload = {}
+        headers = {
+          'User-Agent': 'curl/7.81.0', # requests.utils.default_user_agent()
+        }
+        response = requests.get(url, headers=headers, data=payload)
+        content = response.content
 
-    # SECTION - 1/1 http req to link
-    response = requests.get(url)
-    content = response.content
+        # SECTION 1/2 - open browser and navigate to url wait then for page load
+        # content = openChrome(url)
 
-    # SECTION 1/2 - open browser and navigate to url wait then for page load
-    # content = openChrome(url)
+        # SECTION 2 - parse content to beautifulsoup
+        soup = BeautifulSoup(content, "html.parser")
 
-    # SECTION 2 - parse content to beautifulsoup
-    soup = BeautifulSoup(content, "html.parser")
-
-    # SECTION 3 - write to file like html
-    writeToFile("index-big-c.html", soup.prettify())
+        # SECTION 3 - write to file like html
+        writeToFile("big-c-product-detail.html", soup.prettify())
 
     # SECTION 4 - process from html file or content
-    soup = readContentFromFile("index-big-c.html")
+    soup = readContentFromFile("big-c-product-detail.html")
 
-    # SECTION 5 - parse data
-    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    merchantName = MERCHANT['BIG_C']
-    productName = ""
-    productPriceSale = None
-    productBasePrice = None
-    productUrl = url
-    
-    productName = soup.select_one('h1[id="pdp_product-title"]').text.strip()
-    productPriceSale = soup.select_one('div[id="pdp_product-price"] div[class*="productDetail_product_price"]')
-    for item in productPriceSale.select('span[class*="productDetail_"]'):
-      item.decompose()
-    productPriceSale = productPriceSale.text.strip()
-    productBasePrice = soup.select_one('div[class*="productDetail_product_baseprice"] span[id="pdp_price-base"]')
-    if productBasePrice != None:
-      productBasePrice = productBasePrice.text.strip()
+    # SECTION 5 - EXTRACT
+    next_data_script = soup.find('script', id='__NEXT_DATA__')
+    if next_data_script:
+      json_data_str = next_data_script.string
+      try:
+        next_data_object = json.loads(json_data_str)
+        buildId = str(next_data_object['buildId'])
+        canonical = "/product/" + url.rsplit("/", 1)[-1] # str(next_data_object['props']['pageProps']['seoData']['canonical']) # if not firstLoop will use oldhtmldata
+
+        craftUrlApiGetProductDetail = "https://www.bigc.co.th/_next/data/" + buildId + canonical + ".json"
+        print(craftUrlApiGetProductDetail)
+        payload = {}
+        headers = {
+          'User-Agent': 'curl/7.81.0', # requests.utils.default_user_agent()
+        }
+        response = requests.get(craftUrlApiGetProductDetail, headers=headers, data=payload)
+        data = json.loads(response.text)
+        thumbnail_image = escapeComma(str(data['pageProps']['productDetail']['thumbnail_image']))
+        sku = escapeComma(str(data['pageProps']['productDetail']['sku']))
+        name = escapeComma(str(data['pageProps']['productDetail']['name']))
+        image = escapeComma(str(data['pageProps']['productDetail']['image']))
+        brand = escapeComma(str(data['pageProps']['productDetail']['attributes']['brand']))
+        department_name = escapeComma(str(data['pageProps']['productDetail']['attributes']['department_name']))
+        main_barcode = escapeComma(str(data['pageProps']['productDetail']['attributes']['main_barcode']))
+        division_name = escapeComma(str(data['pageProps']['productDetail']['attributes']['division_name']))
+        price_sales = escapeComma(str(data['pageProps']['productDetail']['price_sales']))
+        price_base = escapeComma(str(data['pageProps']['productDetail']['price_base']))
+        special_from_date = escapeComma(str(data['pageProps']['productDetail']['special_from_date']))
+        special_to_date = escapeComma(str(data['pageProps']['productDetail']['special_to_date']))
+        product_id = escapeComma(str(data['pageProps']['productDetail']['product_id']))
+
+        # SECTION 6 Load
+        fileName = "big_c_product_detail" + datetime.now().strftime("%Y%m%d") + "_000" + ".csv"
+        header = ','.join(
+          [
+            'created_at',
+            'thumbnail_image',
+            'sku',
+            'name',
+            'image',
+            'brand',
+            'department_name',
+            'main_barcode',
+            'division_name',
+            'price_sales',
+            'price_base',
+            'special_from_date',
+            'special_to_date',
+            'product_id'
+          ]
+        ) + '\n'
+        content = ','.join(
+          [
+            datetime.now().isoformat(),
+            thumbnail_image,
+            sku,
+            name,
+            image,
+            brand,
+            department_name,
+            main_barcode,
+            division_name,
+            price_sales,
+            price_base,
+            special_from_date,
+            special_to_date,
+            product_id
+          ]
+        ) + '\n'
+        appendToFile(fileName, header, content)
+      except Exception as e:
+        print(f'An error occurred: ${e}')
     else:
-      productBasePrice = ""
+      print("JSON script tag not found using regex.")
 
-    # DEBUG
-    # print("---------- DEBUG ----------")
-    # print(f'name: {productName}')
-    # print(f'price sale: {productPriceSale}')
-    # print(f'basePrice {productBasePrice}')
 
-    # SECTION 6 - WRITE TO FILE LIKE CSV
-    writeToCsv(date, merchantName, productName, productPriceSale, productBasePrice, productUrl)
+
 
 
   def processMakroPro(self, url):
     print('processMakroPro...')
 
-    # SECTION - 1/1 http req to link
-    # response = requests.get(url)
-    # content = response.content
+    isDebugFromExistingHTMLFile = False
+    if (isDebugFromExistingHTMLFile == False):
+      # SECTION - 1/1 http req to link
+      response = requests.get(url)
+      content = response.content
 
-    # SECTION 1/2 - open browser and navigate to url wait then for page load
-    content = openChrome(url)
+      # SECTION 1/2 - open browser and navigate to url wait then for page load
+      # content = openChrome(url)
 
-    # SECTION 2 - parse content to beautifulsoup
-    soup = BeautifulSoup(content, "html.parser")
+      # SECTION 2 - parse content to beautifulsoup
+      soup = BeautifulSoup(content, "html.parser")
 
-    # SECTION 3 - write to file like html
-    writeToFile("index-makro-pro.html", soup.prettify())
+      # SECTION 3 - write to file like html
+      writeToFile("makro-pro-product-detail.html", soup.prettify())
 
     # SECTION 4 - process from html file or content
-    soup = readContentFromFile("index-makro-pro.html")
+    soup = readContentFromFile("makro-pro-product-detail.html")
 
-    # SECTION 5 - parse data
-    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    merchantName = MERCHANT['MAKRO_PRO']
-    productName = soup.find("div", attrs={'class': 'MuiBox-root css-13u9jxe'}).text.strip()
-    productPriceSale = None
-    productBasePrice = None
-    productUrl = url
+    # SECTION 5 - EXTRACT
+    next_data_script = soup.find('script', id='__NEXT_DATA__')
+    if next_data_script:
+      json_data_str = next_data_script.string
 
-    # priceElement
-    priceElement = soup.find("div", attrs={"class": "MuiBox-root css-17633zz"})
-    if (priceElement.find("div", attrs={"class": "slab"})):
-      productPriceSale = priceElement.div.div.find_all("div")[1].text.strip().split("\n")[0]
-      productBasePrice = priceElement.div.div.find_all("div")[3].p.text.strip().split(" ")[0]
+      try:
+        next_data_object = json.loads(json_data_str)
+        title = str(next_data_object['props']['pageProps']['product']['title'])
+        # description = str(next_data_object['props']['pageProps']['product']['description'])
+        brand = str(next_data_object['props']['pageProps']['product']['brand'])
+        size = str(next_data_object['props']['pageProps']['product']['size'])
+        displayPrice = str(next_data_object['props']['pageProps']['product']['displayPrice'])
+        originPrice = str(next_data_object['props']['pageProps']['product']['originPrice'])
+        priceUnit = str(next_data_object['props']['pageProps']['product']['priceUnit'])
+        sku = str(next_data_object['props']['pageProps']['product']['sku'])
+        imageUrls = str(next_data_object['props']['pageProps']['product']['imageUrls'])
+
+        # SECTION 6 Load
+        fileName = "makro_product_detail" + datetime.now().strftime("%Y%m%d") + "_000" + ".csv"
+        header = ','.join(
+          [
+            'createdAt',
+            'title',
+            'brand',
+            'size',
+            'displayPrice',
+            'originPrice',
+            'priceUnit',
+            'sku',
+            'imageUrls'
+          ]
+        ) + '\n'
+        content = ','.join(
+          [
+            datetime.now().isoformat(),
+            title,
+            brand,
+            size,
+            displayPrice,
+            originPrice,
+            priceUnit,
+            sku,
+            imageUrls
+          ]
+        ) + '\n'
+        appendToFile(fileName, header, content)
+      except Exception as e:
+        print(f'An error occurred: ${e}')
     else:
-      productPriceSale = priceElement.div.div.div.p.text.strip()
-      productBasePrice = productPriceSale
+      print("JSON script tag not found using regex.")
 
-    # DEBUG
-    # print("---------- DEBUG ----------")
-    # print(f'name: {productName}')
-    # print(f'price sale: {productPriceSale}')
-    # print(f'basePrice {productBasePrice}')
 
-    # SECTION 6 - WRITE TO FILE LIKE CSV
-    writeToCsv(date, merchantName, productName, productPriceSale, productBasePrice, productUrl)
+
 
 
   def processWatsons(self, url):
@@ -193,7 +296,6 @@ class BotScaper:
       productBasePrice = productPriceSale
     if elementPurchasePanal.find("div", attrs={"class": "recommended-retail-price"}) != None:
       productBasePrice = elementPurchasePanal.find("div", attrs={"class": "recommended-retail-price"}).find("span", class_="retail-price").text.strip().replace("฿", "")
-      
 
     # DEBUG
     # print("---------- DEBUG ----------")

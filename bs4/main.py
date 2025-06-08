@@ -18,19 +18,40 @@ f = open('bs4/data.json')
 listData = json.load(f)
 f.close()
 
-for item in listData:
-  if item['link']:
-    scaper = BotScaper()
+# ----- BIG_C -----
+index = 0
+f = open('bs4/source_big_c_product_detail_pages.json')
+bigcProductDetailPages = json.load(f)
+f.close()
+for page in bigcProductDetailPages:
+  isFirstLoop = index == 0
+  index += 1
 
-    if item['merchant'] == MERCHANT['BIG_C']:
-      scaper.processBigC(item['link'])
-    elif item['merchant'] == MERCHANT['MAKRO_PRO']:
-      scaper.processMakroPro(item['link'])
-    # elif item['merchant'] == MERCHANT['WATSONS']:
-    #   scaper.processWatsons(item['link'])
-    elif item['merchant'] == MERCHANT['TOPS']:
-      scaper.processTops(item['link'])
-    elif item['merchant'] == MERCHANT['LOTUSS']:
-      scaper.processLotuss(item['link'])
-    elif item['merchant'] == MERCHANT['FRESHKET']:
-      scaper.processFreshket(item['link'])
+  scaper = BotScaper()
+  url = page['url']
+  scaper.processBigC(url, isFirstLoop)
+
+# ----- MAKRO_PRO -----
+f = open('bs4/source_makro_pro_product_detail_pages.json')
+makroProductDetailPages = json.load(f)
+f.close()
+for page in makroProductDetailPages:
+  scaper = BotScaper()
+  url = page['url']
+  scaper.processMakroPro(url)
+
+# for item in listData:
+#   if item['link']:
+#     scaper = BotScaper()
+
+#     # if item['merchant'] == MERCHANT['BIG_C']:
+#     #   scaper.processBigC(item['link'])
+    
+#     # elif item['merchant'] == MERCHANT['WATSONS']:
+#     #   scaper.processWatsons(item['link'])
+#     # elif item['merchant'] == MERCHANT['TOPS']:
+#     #   scaper.processTops(item['link'])
+#     # elif item['merchant'] == MERCHANT['LOTUSS']:
+#     #   scaper.processLotuss(item['link'])
+#     # elif item['merchant'] == MERCHANT['FRESHKET']:
+#     #   scaper.processFreshket(item['link'])

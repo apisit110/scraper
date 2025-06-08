@@ -58,3 +58,41 @@ ELT (Extract – Load – Transform)
 
 > Landing Zone = pos, web site, sensor, file, cloud
 > Staging = raw data store in database
+
+----------
+
+- Extract อ่านข้อมูลจาก Source เช่น Web, App
+- Load เก็บไว้ใน Data lake หรือเก็บในเครื่องตัวเองก่อนใช้สำหรับทดสอบเท่านั้น
+- Transform ดึงข้อมูลที่เก็บไว้มาแปลงให้เป็น format ที่ต้องการแต่ละ Web จะได้ข้อมูลไม่เหมือนกัน แต่เราอยากรู้ว่าสินค้าแต่ละชิ้น ชื่ออะไร ราคาเท่าไหร่
+
+----------
+
+use pyenv to manage python version
+
+```bash
+# create env
+pyenv virtualenv 3.12.9 scraper
+
+# use env
+pyenv local scraper
+
+# install pacakge
+pip install -r requirements.txt
+
+# start program - Extract and Load
+make start
+```
+
+----------
+
+### BigC - Web
+เขียนด้วย: Next.js + RestAPI
+- หน้า product detail เป็น ssr เราสามารถใช้ http get ได้เลยไม่ต้องเข้าถึง ui element ข้อมูลจะอยู่ใน tags script id คือ `__NEXT_DATA__` และต้องยิง api เส้น get product detail เพื่อดูรายละเอียดสินค้า
+
+### Makro - Web
+เขียนด้วย: Next.js + GraphQL
+- หน้า product detail เป็น ssr เราสามารถใช้ http get ได้เลยไม่ต้องเข้าถึง ui element ข้อมูลจะอยู่ใน tags script id คือ `__NEXT_DATA__`
+
+### Watsons - Web
+เขียนด้วย: Angular
+- หน้า product detail มีข้อมูลอยู่ใน tags script id คือ `wtcth-state`
