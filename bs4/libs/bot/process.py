@@ -134,7 +134,7 @@ class BotScaper:
         product_id = escapeComma(str(data['pageProps']['productDetail']['product_id']))
 
         # SECTION 6 Load
-        fileName = "big_c_product_detail" + datetime.now().strftime("%Y%m%d") + "_000" + ".csv"
+        fileName = "big_c_product_detail_" + datetime.now().strftime("%Y%m%d") + "_000" + ".csv"
         header = ','.join(
           [
             'created_at',
@@ -220,7 +220,7 @@ class BotScaper:
         imageUrls = str(next_data_object['props']['pageProps']['product']['imageUrls'])
 
         # SECTION 6 Load
-        fileName = "makro_product_detail" + datetime.now().strftime("%Y%m%d") + "_000" + ".csv"
+        fileName = "makro_product_detail_" + datetime.now().strftime("%Y%m%d") + "_000" + ".csv"
         header = ','.join(
           [
             'createdAt',
@@ -336,7 +336,7 @@ class BotScaper:
       productBasePrice = elementProductDetailsCommonDescription.find("div", class_="product-Details-right-block") .find("div", class_="product-Details-price-block").find("span", class_="product-Details-actual-price").text.strip()
 
     # SECTION 6 Load
-    fileName = "tops_product_detail" + datetime.now().strftime("%Y%m%d") + "_000" + ".csv"
+    fileName = "tops_product_detail_" + datetime.now().strftime("%Y%m%d") + "_000" + ".csv"
     header = ','.join(
       [
         'createdAt',
@@ -392,7 +392,7 @@ class BotScaper:
     finalPricePerUOW = escapeComma(str(data['data']['finalPricePerUOW']))
 
     # SECTION 6 Load
-    fileName = "lotuss_product_detail" + datetime.now().strftime("%Y%m%d") + "_000" + ".csv"
+    fileName = "lotuss_product_detail_" + datetime.now().strftime("%Y%m%d") + "_000" + ".csv"
     header = ','.join(
       [
         'createdAt',
@@ -456,7 +456,7 @@ class BotScaper:
         price = escapeComma(str(next_data_object['props']['pageProps']['detail']['sellingPrice']['price']))
 
         # SECTION 6 Load
-        fileName = "freshket_product_detail" + datetime.now().strftime("%Y%m%d") + "_000" + ".csv"
+        fileName = "freshket_product_detail_" + datetime.now().strftime("%Y%m%d") + "_000" + ".csv"
         header = ','.join(
           [
             'createdAt',
