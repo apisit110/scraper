@@ -113,7 +113,6 @@ class BotScaper:
         canonical = "/product/" + url.rsplit("/", 1)[-1] # str(next_data_object['props']['pageProps']['seoData']['canonical']) # if not firstLoop will use oldhtmldata
 
         craftUrlApiGetProductDetail = "https://www.bigc.co.th/_next/data/" + buildId + canonical + ".json"
-        print(craftUrlApiGetProductDetail)
         payload = {}
         headers = {
           'User-Agent': 'curl/7.81.0', # requests.utils.default_user_agent()
@@ -366,46 +365,62 @@ class BotScaper:
     print('processLotuss...')
 
     # SECTION - 1/1 http req to link
-    # response = requests.get(url)
+    sku = url.rsplit("/", 1)[-1]
+    craftUrlApiGetProductDetail = "https://api-o2o.lotuss.com/lotuss-mobile-bff/product/v4/product?slug=" + sku
+    response = requests.get(craftUrlApiGetProductDetail)
     # content = response.content
 
     # SECTION 1/2 - open browser and navigate to url wait then for page load
-    content = openChrome(url)
+    # content = openChrome(url)
 
     # SECTION 2 - parse content to beautifulsoup
-    soup = BeautifulSoup(content, "html.parser")
+    # soup = BeautifulSoup(content, "html.parser")
 
     # SECTION 3 - write to file like html
-    writeToFile("index-lotuss.html", soup.prettify())
+    # writeToFile("lotuss-product-detail.html", soup.prettify())
 
     # SECTION 4 - process from html file or content
-    soup = readContentFromFile("index-lotuss.html")
+    # soup = readContentFromFile("lotuss-product-detail.html")
 
-    # SECTION 5 - parse data
-    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    merchantName = MERCHANT["LOTUSS"]
-    productName = ""
-    productPriceSale = ""
-    productBasePrice = ""
-    productUrl = url
+    # SECTION 5 - EXTRACT
+    data = json.loads(response.text)
+    id = escapeComma(str(data['data']['id']))
+    sku = escapeComma(str(data['data']['sku']))
+    name = escapeComma(str(data['data']['name']))
+    brand = escapeComma(str(data['data']['links']['brand']['name']))
+    regularPricePerUOW = escapeComma(str(data['data']['regularPricePerUOW']))
+    finalPricePerUOW = escapeComma(str(data['data']['finalPricePerUOW']))
 
-    elementProductPanel = soup.find("button", {"id": "add-to-cart-btn-0"}).parent.parent.parent.parent
-    productName = elementProductPanel.find_all("div")[0].find("h1").text.strip()
-    productPriceSale = elementProductPanel.find_all("div")[2].find_all("div")[0].get_text(strip=True, separator="|").split("|")[1]
-    productBasePrice = productPriceSale
-    try:
-      productBasePrice = elementProductPanel.find_all("div")[2].find_all("div")[1].get_text(strip=True).split("/")[0].replace("฿", "")
-    except:
-      pass
+    # SECTION 6 Load
+    fileName = "lotuss_product_detail" + datetime.now().strftime("%Y%m%d") + "_000" + ".csv"
+    header = ','.join(
+      [
+        'createdAt',
+        'id',
+        'sku',
+        'name',
+        'brand',
+        'regularPricePerUOW',
+        'finalPricePerUOW',
+        'url'
+      ]
+    ) + '\n'
+    content = ','.join(
+      [
+        datetime.now().isoformat(),
+        id,
+        sku,
+        name,
+        brand,
+        regularPricePerUOW,
+        finalPricePerUOW,
+        url
+      ]
+    ) + '\n'
+    appendToFile(fileName, header, content)
 
-    # DEBUG
-    # print("---------- DEBUG ----------")
-    # print(f'name: {productName}')
-    # print(f'price sale: {productPriceSale}')
-    # print(f'basePrice {productBasePrice}')
 
-    # SECTION 6 - WRITE TO FILE LIKE CSV
-    writeToCsv(date, merchantName, productName, productPriceSale, productBasePrice, productUrl)
+
 
 
   def processFreshket(self, url):

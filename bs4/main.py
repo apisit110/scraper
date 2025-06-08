@@ -40,6 +40,9 @@ for page in makroProductDetailPages:
   url = page['url']
   scaper.processMakroPro(url)
 
+# ----- Watsons -----
+# ...
+
 # ----- TOPS -----
 f = open('bs4/source_tops_product_detail_pages.json')
 topsProductDetailPages = json.load(f)
@@ -48,6 +51,16 @@ for page in topsProductDetailPages:
   scaper = BotScaper()
   url = page['url']
   scaper.processTops(url)
+
+# ----- Lotuss -----
+f = open('bs4/source_lotuss_product_detail_pages.json')
+lotussProductDetailPages = json.load(f)
+f.close()
+for page in lotussProductDetailPages:
+  scaper = BotScaper()
+  url = page['url']
+  scaper.processLotuss(url)
+
 
 # for item in listData:
 #   if item['link']:
