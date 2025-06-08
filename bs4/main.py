@@ -40,6 +40,15 @@ for page in makroProductDetailPages:
   url = page['url']
   scaper.processMakroPro(url)
 
+# ----- TOPS -----
+f = open('bs4/source_tops_product_detail_pages.json')
+topsProductDetailPages = json.load(f)
+f.close()
+for page in topsProductDetailPages:
+  scaper = BotScaper()
+  url = page['url']
+  scaper.processTops(url)
+
 # for item in listData:
 #   if item['link']:
 #     scaper = BotScaper()

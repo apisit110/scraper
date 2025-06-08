@@ -27,7 +27,7 @@ How it work
 - Watsons
   - [ ] Web
 - Tops
-  - [ ] Web
+  - [x] Web
 - Lotuss
   - [ ] Web
 - Freshket

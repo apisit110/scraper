@@ -310,30 +310,25 @@ class BotScaper:
   def processTops(self, url):
     print('processTops...')
 
-    # SECTION - 1/1 http req to link
-    # response = requests.get(url)
-    # content = response.content
+    isDebugFromExistingHTMLFile = False
+    if (isDebugFromExistingHTMLFile == False):
+      # SECTION - 1/1 http req to link
+      # response = requests.get(url)
+      # content = response.content
 
-    # SECTION 1/2 - open browser and navigate to url wait then for page load
-    content = openChrome(url)
+      # SECTION 1/2 - open browser and navigate to url wait then for page load
+      content = openChrome(url)
 
-    # SECTION 2 - parse content to beautifulsoup
-    soup = BeautifulSoup(content, "html.parser")
+      # SECTION 2 - parse content to beautifulsoup
+      soup = BeautifulSoup(content, "html.parser")
 
-    # SECTION 3 - write to file like html
-    writeToFile("index-tops.html", soup.prettify())
+      # SECTION 3 - write to file like html
+      writeToFile("tops-product-detail.html", soup.prettify())
 
     # SECTION 4 - process from html file or content
-    soup = readContentFromFile("index-tops.html")
+    soup = readContentFromFile("tops-product-detail.html")
 
-    # SECTION 5 - parse data
-    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    merchantName = MERCHANT["TOPS"]
-    productName = ""
-    productPriceSale = ""
-    productBasePrice = ""
-    productUrl = url
-
+    # SECTION 5 - EXTRACT
     elementProductDetailsCommonDescription = soup.find("div", class_="product-Details-common-description")
     productName = elementProductDetailsCommonDescription.find("div", class_="product-Details-left-block").find("div", class_="product-Details-name").find("h1").text.strip()
     productPriceSale = elementProductDetailsCommonDescription.find("div", class_="product-Details-right-block") .find("div", class_="product-Details-price-block").find("span", class_="product-Details-current-price").text.strip()
@@ -341,17 +336,32 @@ class BotScaper:
     if elementProductDetailsCommonDescription.find("div", class_="product-Details-right-block").find("div", class_="product-Details-price-block").find("span", class_="product-Details-actual-price") != None:
       productBasePrice = elementProductDetailsCommonDescription.find("div", class_="product-Details-right-block") .find("div", class_="product-Details-price-block").find("span", class_="product-Details-actual-price").text.strip()
 
+    # SECTION 6 Load
+    fileName = "tops_product_detail" + datetime.now().strftime("%Y%m%d") + "_000" + ".csv"
+    header = ','.join(
+      [
+        'createdAt',
+        'productName',
+        'productPriceSale',
+        'productBasePrice',
+        'url'
+      ]
+    ) + '\n'
+    content = ','.join(
+      [
+        datetime.now().isoformat(),
+        productName,
+        productPriceSale,
+        productBasePrice,
+        url
+      ]
+    ) + '\n'
+    appendToFile(fileName, header, content)
 
-    # DEBUG
-    # print("---------- DEBUG ----------")
-    # print(f'name: {productName}')
-    # print(f'price sale: {productPriceSale}')
-    # print(f'basePrice {productBasePrice}')
 
-    # SECTION 6 - WRITE TO FILE LIKE CSV
-    writeToCsv(date, merchantName, productName, productPriceSale, productBasePrice, productUrl)
 
-    
+
+
   def processLotuss(self, url):
     print('processLotuss...')
 
