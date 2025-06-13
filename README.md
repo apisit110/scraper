@@ -36,11 +36,11 @@ How it work
   - [x] Web
 - Freshket
   - [x] Web
+- All ONLINE
+  - [x] Web
 - Multybeauty
   - [ ] Web
 - Shopee
-  - [ ] Web
-- All ONLINE
   - [ ] Web
 
 

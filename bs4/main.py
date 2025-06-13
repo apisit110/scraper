@@ -75,3 +75,11 @@ for page in lotussProductDetailPages:
   url = page['url']
   scaper.processFreshket(url)
 
+# ----- All ONLINE -----
+f = open('bs4/source_allonline_product_detail_pages.json')
+allonlineProductDetailPages = json.load(f)
+f.close()
+for page in allonlineProductDetailPages:
+  scaper = BotScaper()
+  url = page['url']
+  scaper.processAllOnline(url)

@@ -332,7 +332,6 @@ class BotScaper:
     # SECTION 4 - process from html file or content
     soup = readContentFromFile("tops-product-detail.html")
 
-
     # SECTION 5 - EXTRACT
     sku = ""
     brand = ""
@@ -520,3 +519,75 @@ class BotScaper:
         print(f'An error occurred: ${e}')
     else:
       print("JSON script tag not found using regex.")
+
+
+
+
+
+  def processAllOnline(selt, url):
+    print(f'processAllOnline: {url}')
+
+    isDebugFromExistingHTMLFile = False
+    if (isDebugFromExistingHTMLFile == False):
+      # SECTION - 1/1 http req to link
+      response = requests.get(url)
+      content = response.content
+
+      # SECTION 1/2 - open browser and navigate to url wait then for page load
+      # content = openChrome(url)
+
+      # SECTION 2 - parse content to beautifulsoup
+      soup = BeautifulSoup(content, "html.parser")
+
+      # SECTION 3 - write to file like html
+      writeToFile("allonline-product-detail.html", soup.prettify())
+
+    # SECTION 4 - process from html file or content
+    soup = readContentFromFile("allonline-product-detail.html")
+
+    # SECTION 5 - EXTRACT
+    name = ""
+    brand = ""
+    sku = ""
+    productPriceSale = ""
+    productBasePrice = ""
+    imageUrl = ""
+    stockStatus = ""
+
+    name = soup.find("h1", attrs={"id": "title-product"}).text.strip()
+    brand = soup.find("meta", {"itemprop": "name"})["content"]
+    sku = soup.find("span", {"itemprop": "sku"}).text.strip()
+    productPriceSale = soup.find("div", attrs={"class": "price"}).find("span", attrs={"class": "currentPrice"}).text.replace("฿", "").strip()
+    productBasePrice = soup.find("div", attrs={"class": "price"}).find("strike").text.replace("฿", "").strip()
+    imageUrl = soup.find("div", attrs={"class": "main-image"}).select_one('img[src]:not([src=""])')["src"]
+    stockStatus = soup.find("div", attrs={"class": "order-count-wrapper"}).find("div", attrs={"class": "available"}).text.strip()
+
+    # SECTION 6 Load
+    fileName = "allonline_product_detail_" + datetime.now().strftime("%Y%m%d") + "_000" + ".csv"
+    header = ','.join(
+      [
+        'createdAt',
+        'name',
+        'brand',
+        'sku',
+        'productPriceSale',
+        'productBasePrice',
+        'imageUrl',
+        'stockStatus',
+        'url'
+      ]
+    ) + '\n'
+    content = ','.join(
+      [
+        datetime.now().isoformat(),
+        name,
+        brand,
+        sku,
+        productPriceSale,
+        productBasePrice,
+        imageUrl,
+        stockStatus,
+        url
+      ]
+    ) + '\n'
+    appendToFile(fileName, header, content)
