@@ -35,7 +35,7 @@ How it work
 - Lotuss
   - [x] Web
 - Freshket
-  - [ ] Web
+  - [x] Web
 - Multybeauty
   - [ ] Web
 - Shopee
