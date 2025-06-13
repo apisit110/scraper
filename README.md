@@ -132,9 +132,13 @@ make start
 - หน้า product detail เข้าถึง ui element เพื่อดึงข้อมูล
 
 #### Columns
-- productName
+- name
+- brand
+- sku
 - productPriceSale
 - productBasePrice
+- imageUrl
+- stockStatus
 
 ### Lotuss
 เขียนด้วย Java? + rest api
@@ -147,6 +151,7 @@ make start
 - brand
 - regularPricePerUOW
 - finalPricePerUOW
+- stockStatus
 
 
 ### Freshket
