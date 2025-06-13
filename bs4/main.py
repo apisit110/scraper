@@ -18,6 +18,7 @@ f = open('bs4/data.json')
 listData = json.load(f)
 f.close()
 
+
 # ----- BIG_C -----
 index = 0
 f = open('bs4/source_big_c_product_detail_pages.json')
@@ -31,6 +32,7 @@ for page in bigcProductDetailPages:
   url = page['url']
   scaper.processBigC(url, isFirstLoop)
 
+
 # ----- MAKRO_PRO -----
 f = open('bs4/source_makro_pro_product_detail_pages.json')
 makroProductDetailPages = json.load(f)
@@ -39,6 +41,7 @@ for page in makroProductDetailPages:
   scaper = BotScaper()
   url = page['url']
   scaper.processMakroPro(url)
+
 
 # ----- Watsons -----
 # processWatsons...
@@ -52,6 +55,7 @@ for page in topsProductDetailPages:
   url = page['url']
   scaper.processTops(url)
 
+
 # ----- Lotuss -----
 f = open('bs4/source_lotuss_product_detail_pages.json')
 lotussProductDetailPages = json.load(f)
@@ -61,7 +65,8 @@ for page in lotussProductDetailPages:
   url = page['url']
   scaper.processLotuss(url)
 
-# ----- Lotuss -----
+
+# ----- Freshket -----
 f = open('bs4/source_freshket_product_detail_pages.json')
 lotussProductDetailPages = json.load(f)
 f.close()

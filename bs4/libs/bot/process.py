@@ -24,6 +24,14 @@ def escapeComma(value):
     return '"' + value + '"'
   return value
 
+def getNested(d, keys, default=None):
+  for key in keys:
+    if isinstance(d, dict):
+      d = d.get(key, default)
+    else:
+      return default
+  return d
+
 def openChrome(url):
   options = webdriver.ChromeOptions()
   options.add_argument('--headless')  # If you want to run Chrome in headless mode
@@ -78,7 +86,7 @@ class BotScaper:
     pass
 
   def processBigC(self, url, isFirstLoop):
-    print('processBigC...')
+    print(f'processBigC: {url}')
     
     isDebugFromExistingHTMLFile = False
     if (isDebugFromExistingHTMLFile == False):
@@ -119,56 +127,46 @@ class BotScaper:
         }
         response = requests.get(craftUrlApiGetProductDetail, headers=headers, data=payload)
         data = json.loads(response.text)
-        thumbnail_image = escapeComma(str(data['pageProps']['productDetail']['thumbnail_image']))
-        sku = escapeComma(str(data['pageProps']['productDetail']['sku']))
-        name = escapeComma(str(data['pageProps']['productDetail']['name']))
-        image = escapeComma(str(data['pageProps']['productDetail']['image']))
-        brand = escapeComma(str(data['pageProps']['productDetail']['attributes']['brand']))
-        department_name = escapeComma(str(data['pageProps']['productDetail']['attributes']['department_name']))
-        main_barcode = escapeComma(str(data['pageProps']['productDetail']['attributes']['main_barcode']))
-        division_name = escapeComma(str(data['pageProps']['productDetail']['attributes']['division_name']))
-        price_sales = escapeComma(str(data['pageProps']['productDetail']['price_sales']))
-        price_base = escapeComma(str(data['pageProps']['productDetail']['price_base']))
-        special_from_date = escapeComma(str(data['pageProps']['productDetail']['special_from_date']))
-        special_to_date = escapeComma(str(data['pageProps']['productDetail']['special_to_date']))
-        product_id = escapeComma(str(data['pageProps']['productDetail']['product_id']))
+        product_id = escapeComma(str(getNested(data, ['pageProps', 'productDetail', 'product_id'], default='')))
+        price_sales = escapeComma(str(getNested(data, ['pageProps', 'productDetail', 'price_sales'], default='')))
+        volume = escapeComma(str(getNested(data, ['pageProps', 'productDetail', 'volume'], default='')))
+        name = escapeComma(str(getNested(data, ['pageProps', 'productDetail', 'name'], default='')))
+        sku = escapeComma(str(getNested(data, ['pageProps', 'productDetail', 'sku'], default='')))
+        price_base = escapeComma(str(getNested(data, ['pageProps', 'productDetail', 'price_base'], default='')))
+        main_barcode = escapeComma(str(getNested(data, ['pageProps', 'productDetail', 'attributes', 'main_barcode'], default='')))
+        department_name = escapeComma(str(getNested(data, ['pageProps', 'productDetail', 'attributes', 'department_name'], default='')))
+        brand = escapeComma(str(getNested(data, ['pageProps', 'productDetail', 'attributes', 'brand'], default='')))
 
         # SECTION 6 Load
         fileName = "big_c_product_detail_" + datetime.now().strftime("%Y%m%d") + "_000" + ".csv"
         header = ','.join(
           [
             'created_at',
-            'thumbnail_image',
-            'sku',
-            'name',
-            'image',
-            'brand',
-            'department_name',
-            'main_barcode',
-            'division_name',
+            'product_id',
             'price_sales',
             'price_base',
-            'special_from_date',
-            'special_to_date',
-            'product_id'
+            'volume',
+            'name',
+            'sku',
+            'main_barcode',
+            'department_name',
+            'brand',
+            'url'
           ]
         ) + '\n'
         content = ','.join(
           [
             datetime.now().isoformat(),
-            thumbnail_image,
-            sku,
-            name,
-            image,
-            brand,
-            department_name,
-            main_barcode,
-            division_name,
+            product_id,
             price_sales,
             price_base,
-            special_from_date,
-            special_to_date,
-            product_id
+            volume,
+            name,
+            sku,
+            main_barcode,
+            department_name,
+            brand,
+            url
           ]
         ) + '\n'
         appendToFile(fileName, header, content)
@@ -182,7 +180,7 @@ class BotScaper:
 
 
   def processMakroPro(self, url):
-    print('processMakroPro...')
+    print(f'processMakroPro: {url}')
 
     isDebugFromExistingHTMLFile = False
     if (isDebugFromExistingHTMLFile == False):
@@ -209,15 +207,16 @@ class BotScaper:
 
       try:
         next_data_object = json.loads(json_data_str)
-        title = str(next_data_object['props']['pageProps']['product']['title'])
-        # description = str(next_data_object['props']['pageProps']['product']['description'])
-        brand = str(next_data_object['props']['pageProps']['product']['brand'])
-        size = str(next_data_object['props']['pageProps']['product']['size'])
-        displayPrice = str(next_data_object['props']['pageProps']['product']['displayPrice'])
-        originPrice = str(next_data_object['props']['pageProps']['product']['originPrice'])
-        priceUnit = str(next_data_object['props']['pageProps']['product']['priceUnit'])
-        sku = str(next_data_object['props']['pageProps']['product']['sku'])
-        imageUrls = str(next_data_object['props']['pageProps']['product']['imageUrls'])
+        title = escapeComma(str(getNested(next_data_object, ['props', 'pageProps', 'product', 'title'], default='')))
+        brand = escapeComma(str(getNested(next_data_object, ['props', 'pageProps', 'product', 'brand'], default='')))
+        size = escapeComma(str(getNested(next_data_object, ['props', 'pageProps', 'product', 'size'], default='')))
+        displayPrice = escapeComma(str(getNested(next_data_object, ['props', 'pageProps', 'product', 'displayPrice'], default='')))
+        originPrice = escapeComma(str(getNested(next_data_object, ['props', 'pageProps', 'product', 'originPrice'], default='')))
+        sku = escapeComma(str(getNested(next_data_object, ['props', 'pageProps', 'product', 'sku'], default='')))
+        totalInventory = escapeComma(str(getNested(next_data_object, ['props', 'pageProps', 'product', 'totalInventory'], default='')))
+        slabPriceTiers = escapeComma(str(getNested(next_data_object, ['props', 'pageProps', 'product', 'slabPrices', 'slabPriceTiers'], default=''))) # array
+        productId = escapeComma(str(getNested(next_data_object, ['props', 'pageProps', 'productId'], default='')))
+        buildId = escapeComma(str(getNested(next_data_object, ['buildId'], default='')))
 
         # SECTION 6 Load
         fileName = "makro_product_detail_" + datetime.now().strftime("%Y%m%d") + "_000" + ".csv"
@@ -229,9 +228,12 @@ class BotScaper:
             'size',
             'displayPrice',
             'originPrice',
-            'priceUnit',
             'sku',
-            'imageUrls'
+            'totalInventory',
+            'slabPriceTiers',
+            'productId',
+            'buildId',
+            'url'
           ]
         ) + '\n'
         content = ','.join(
@@ -242,9 +244,12 @@ class BotScaper:
             size,
             displayPrice,
             originPrice,
-            priceUnit,
             sku,
-            imageUrls
+            totalInventory,
+            slabPriceTiers,
+            productId,
+            buildId,
+            url
           ]
         ) + '\n'
         appendToFile(fileName, header, content)
@@ -258,7 +263,7 @@ class BotScaper:
 
 
   def processWatsons(self, url):
-    print('processWatsons...')
+    print(f'processWatsons: {url}')
 
     # SECTION - 1/1 http req to link
     # response = requests.get(url)
@@ -307,7 +312,7 @@ class BotScaper:
 
 
   def processTops(self, url):
-    print('processTops...')
+    print(f'processTops: {url}')
 
     isDebugFromExistingHTMLFile = False
     if (isDebugFromExistingHTMLFile == False):
@@ -362,7 +367,7 @@ class BotScaper:
 
 
   def processLotuss(self, url):
-    print('processLotuss...')
+    print(f'processLotuss: {url}')
 
     # SECTION - 1/1 http req to link
     sku = url.rsplit("/", 1)[-1]
@@ -384,12 +389,12 @@ class BotScaper:
 
     # SECTION 5 - EXTRACT
     data = json.loads(response.text)
-    id = escapeComma(str(data['data']['id']))
-    sku = escapeComma(str(data['data']['sku']))
-    name = escapeComma(str(data['data']['name']))
-    brand = escapeComma(str(data['data']['links']['brand']['name']))
-    regularPricePerUOW = escapeComma(str(data['data']['regularPricePerUOW']))
-    finalPricePerUOW = escapeComma(str(data['data']['finalPricePerUOW']))
+    id = escapeComma(str(getNested(data, ['data', 'id'], default='')))
+    sku = escapeComma(str(getNested(data, ['data', 'sku'], default='')))
+    name = escapeComma(str(getNested(data, ['data', 'name'], default='')))
+    brand = escapeComma(str(getNested(data, ['data', 'links', 'brand', 'name'], default='')))
+    regularPricePerUOW = escapeComma(str(getNested(data, ['data', 'regularPricePerUOW'], default='')))
+    finalPricePerUOW = escapeComma(str(getNested(data, ['data', 'finalPricePerUOW'], default='')))
 
     # SECTION 6 Load
     fileName = "lotuss_product_detail_" + datetime.now().strftime("%Y%m%d") + "_000" + ".csv"
@@ -424,7 +429,7 @@ class BotScaper:
 
 
   def processFreshket(self, url):
-    print('processFreshket...')
+    print(f'processFreshket: {url}')
 
     isDebugFromExistingHTMLFile = False
     if (isDebugFromExistingHTMLFile == False):

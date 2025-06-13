@@ -2,6 +2,10 @@
 
 - สินค้าตัวเดียวกัน แต่ร้านไหนขายถูกสุด
 
+โจทย์
+
+- สินค้าตัวเดียวกันซื้อจากที่ไหนถูกที่สุด
+
 
 How to know current price
 
@@ -91,9 +95,33 @@ make start
 เขียนด้วย: Next.js + RestAPI
 - หน้า product detail เป็น ssr เราสามารถใช้ http get ได้เลยไม่ต้องเข้าถึง ui element ข้อมูลจะอยู่ใน tags script id คือ `__NEXT_DATA__` และต้องยิง api เส้น get product detail เพื่อดูรายละเอียดสินค้า
 
+#### Columns
+- product_id = props.pageProps.productDetail.product_id
+- price_sales = props.pageProps.productDetail.price_sales
+- volume = props.pageProps.productDetail.volume
+- name = props.pageProps.productDetail.name
+- sku = props.pageProps.productDetail.sku
+- price_base = props.pageProps.productDetail.price_base
+- main_barcode = props.pageProps.productDetail.attributes.main_barcode
+- department_name = props.pageProps.productDetail.attributes.department_name
+- brand = props.pageProps.productDetail.attributes.brand
+
+
 ### Makro - Web
 เขียนด้วย: Next.js + GraphQL
 - หน้า product detail เป็น ssr เราสามารถใช้ http get ได้เลยไม่ต้องเข้าถึง ui element ข้อมูลจะอยู่ใน tags script id คือ `__NEXT_DATA__`
+
+#### Columns
+- title = props.pageProps.product.title
+- brand = props.pageProps.product.brand
+- size = props.pageProps.product.size
+- displayPrice = props.pageProps.product.displayPrice
+- originPrice = props.pageProps.product.originPrice
+- sku = props.pageProps.product.sku
+- totalInventory = props.pageProps.product.totalInventory
+- slabPriceTiers = props.pageProps.product.slabPrices.slabPriceTiers <!-- array -->
+- productId = props.pageProps.productId
+- buildId = buildId
 
 ### Watsons - Web
 เขียนด้วย: Angular
@@ -103,11 +131,30 @@ make start
 เขียนด้วย Java?
 - หน้า product detail เข้าถึง ui element เพื่อดึงข้อมูล
 
+#### Columns
+- productName
+- productPriceSale
+- productBasePrice
+
 ### Lotuss
 เขียนด้วย Java? + rest api
 - หน้า product detail เราสามารถใช้ http get ได้เลยไม่ต้องเข้าถึง ui element ยิง api เส้น get product detail เพื่อดูรายละเอียดสินค้า
+
+#### Columns
+- id
+- sku
+- name
+- brand
+- regularPricePerUOW
+- finalPricePerUOW
+
 
 ### Freshket
 เขียนด้วย: Next.js + GraphQL
 - หน้า product detail เป็น ssr เราสามารถใช้ http get ได้เลยไม่ต้องเข้าถึง ui element ข้อมูลจะอยู่ใน tags script id คือ `__NEXT_DATA__`
 
+#### Columns
+- guid
+- name
+- originalPrice
+- price
