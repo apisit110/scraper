@@ -332,31 +332,61 @@ class BotScaper:
     # SECTION 4 - process from html file or content
     soup = readContentFromFile("tops-product-detail.html")
 
+
     # SECTION 5 - EXTRACT
+    sku = ""
+    brand = ""
+    imageUrl = ""
+    name = ""
+    productPriceSale = ""
+    productBasePrice = ""
+    stockStatus = ""
+
+    elementProductDetailsRoot = soup.find("div", class_="product-Details-page-root")
+    if elementProductDetailsRoot:
+      if elementProductDetailsRoot["data-pdpsku"]:
+        sku = elementProductDetailsRoot["data-pdpsku"]
+      if elementProductDetailsRoot["data-product-brand"]:
+        brand = elementProductDetailsRoot["data-product-brand"]
+      if elementProductDetailsRoot["data-product-image-url"]:
+        imageUrl = elementProductDetailsRoot["data-product-image-url"]
+      if elementProductDetailsRoot["data-product-name"]:
+        name = elementProductDetailsRoot["data-product-name"]
+      if elementProductDetailsRoot["data-product-price-new"]:
+        productPriceSale = elementProductDetailsRoot["data-product-price-new"]
+      if elementProductDetailsRoot["data-stock-status"]:
+        stockStatus = elementProductDetailsRoot["data-stock-status"]
+
     elementProductDetailsCommonDescription = soup.find("div", class_="product-Details-common-description")
-    productName = elementProductDetailsCommonDescription.find("div", class_="product-Details-left-block").find("div", class_="product-Details-name").find("h1").text.strip()
-    productPriceSale = elementProductDetailsCommonDescription.find("div", class_="product-Details-right-block") .find("div", class_="product-Details-price-block").find("span", class_="product-Details-current-price").text.strip()
-    productBasePrice = productPriceSale
-    if elementProductDetailsCommonDescription.find("div", class_="product-Details-right-block").find("div", class_="product-Details-price-block").find("span", class_="product-Details-actual-price") != None:
-      productBasePrice = elementProductDetailsCommonDescription.find("div", class_="product-Details-right-block") .find("div", class_="product-Details-price-block").find("span", class_="product-Details-actual-price").text.strip()
+    elementActualPrice = elementProductDetailsCommonDescription.find("div", class_="product-Details-right-block").find("div", class_="product-Details-price-block").find("span", class_="product-Details-actual-price")
+    if elementActualPrice != None:
+      productBasePrice = elementActualPrice.text.strip()
 
     # SECTION 6 Load
     fileName = "tops_product_detail_" + datetime.now().strftime("%Y%m%d") + "_000" + ".csv"
     header = ','.join(
       [
         'createdAt',
-        'productName',
+        'name',
+        'brand',
+        'sku',
         'productPriceSale',
         'productBasePrice',
+        'imageUrl',
+        'stockStatus',
         'url'
       ]
     ) + '\n'
     content = ','.join(
       [
         datetime.now().isoformat(),
-        productName,
+        name,
+        brand,
+        sku,
         productPriceSale,
         productBasePrice,
+        imageUrl,
+        stockStatus,
         url
       ]
     ) + '\n'
@@ -395,6 +425,7 @@ class BotScaper:
     brand = escapeComma(str(getNested(data, ['data', 'links', 'brand', 'name'], default='')))
     regularPricePerUOW = escapeComma(str(getNested(data, ['data', 'regularPricePerUOW'], default='')))
     finalPricePerUOW = escapeComma(str(getNested(data, ['data', 'finalPricePerUOW'], default='')))
+    stockStatus =  escapeComma(str(getNested(data, ['data', 'stockStatus'], default='')))
 
     # SECTION 6 Load
     fileName = "lotuss_product_detail_" + datetime.now().strftime("%Y%m%d") + "_000" + ".csv"
@@ -407,6 +438,7 @@ class BotScaper:
         'brand',
         'regularPricePerUOW',
         'finalPricePerUOW',
+        'stockStatus',
         'url'
       ]
     ) + '\n'
@@ -419,6 +451,7 @@ class BotScaper:
         brand,
         regularPricePerUOW,
         finalPricePerUOW,
+        stockStatus,
         url
       ]
     ) + '\n'
