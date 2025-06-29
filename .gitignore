@@ -2,3 +2,4 @@
 .Makefile.swap
 source/*
 RawZone/*
+__pycache__
