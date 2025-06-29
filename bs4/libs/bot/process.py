@@ -299,7 +299,7 @@ class BotScaper:
 
     # SECTION 5 - parse data
     date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    merchantName = MERCHANT['WATSONS']
+    merchantName = MERCHANTS['WATSONS']
     productName = ""
     productPriceSale = ""
     productBasePrice = ""
