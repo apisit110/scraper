@@ -78,6 +78,9 @@ pyenv virtualenv 3.12.9 scraper
 # use env
 pyenv local scraper
 
+# Output installed packages in requirements format
+pip freeze > requirements.txt
+
 # install pacakge
 pip install -r requirements.txt
 
