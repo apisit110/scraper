@@ -16,8 +16,24 @@ from selenium.webdriver.support import expected_conditions as EC
 
 _path = os.path.join('bs4', 'libs', 'constants', 'merchant.json')
 f = open(_path, 'r')
-MERCHANT = json.load(f)
+MERCHANTS = json.load(f)
 f.close()
+
+def generateRawFileName(merchant, date):
+  if merchant == MERCHANTS['BIG_C']:
+    return f'big_c_product_detail_{date}_000.csv'
+  elif merchant == MERCHANTS['MAKRO_PRO']:
+    return f'makro_product_detail_{date}_000.csv'
+  elif merchant == MERCHANTS['WATSONS']:
+    return f'watsons_product_detail_{date}_000.csv'
+  elif merchant == MERCHANTS['TOPS']:
+    return f'tops_product_detail_{date}_000.csv'
+  elif merchant == MERCHANTS['LOTUSS']:
+    return f'lotuss_product_detail_{date}_000.csv'
+  elif merchant == MERCHANTS['FRESHKET']:
+    return f'freshket_product_detail_{date}_000.csv'
+  elif merchant == MERCHANTS['ALLONLINE']:
+    return f'allonline_product_detail_{date}_000.csv'
 
 def escapeComma(value):
   if "," in value:
