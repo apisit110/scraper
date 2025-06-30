@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 import pandas as pd
 import json
-from libs.bot.process import generateRawFileName
+from libs.bot.process import generateRawFileName, generateProductFileName
 from table_products import tableProducts
 
 class Transform:
@@ -175,7 +175,7 @@ class Transform:
       else:
         print('please add sku to tableProducts for allonline_sku:', sku)
     
-    with open('output.csv', 'w') as f:
+    with open(generateProductFileName(date, '000'), 'w') as f:
       f.write('Id,Date,Name,BIG_C,MAKRO_PRO,WATSONS,TOPS,LOTUSS,ALLONLINE\n')
       for id, data in result.items():
         f.write(f"{data['Id']},{data['Date']},{data['Name']},{data['BIG_C']},{data['MAKRO_PRO']},{data['WATSONS']},{data['TOPS']},{data['LOTUSS']},{data['ALLONLINE']}\n")

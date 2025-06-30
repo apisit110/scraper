@@ -1,6 +1,5 @@
 from libs.bot.process import BotScaper
 import json
-import os
 
 '''
 ELT
@@ -12,15 +11,6 @@ query database to do awesome
 class Extractor:
   def __init__(self):
     pass
-
-  _path = os.path.join('bs4', 'libs', 'constants', 'merchant.json')
-  f = open(_path, 'r')
-  MERCHANT = json.load(f)
-  f.close()
-
-  f = open('bs4/data.json')
-  listData = json.load(f)
-  f.close()
 
   def extractBigC(self):
     # ----- BIG_C -----

@@ -6,7 +6,7 @@ tableProducts = [
     "makro_pro_sku": "219542",
     "tops_sku": "8851952350796",
     "lotuss_sku": "164935888",
-    "allonline_sku": "183145010"
+    "allonline_sku": ""
   },
   {
     "id": 1,
@@ -412,5 +412,14 @@ tableProducts = [
     "tops_sku": "",
     "lotuss_sku": "",
     "allonline_sku": ""
+  },
+  {
+    "id": 46,
+    "name": "น้ำดื่มคริสตัล 1500 มล. (แพ็ก 6 ขวด)",
+    "big_c_sku": "",
+    "makro_pro_sku": "",
+    "tops_sku": "",
+    "lotuss_sku": "",
+    "allonline_sku": "183145010"
   }
 ]

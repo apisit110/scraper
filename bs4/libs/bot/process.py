@@ -19,21 +19,24 @@ f = open(_path, 'r')
 MERCHANTS = json.load(f)
 f.close()
 
-def generateRawFileName(merchant, date):
+def generateRawFileName(merchant, date, runningNumber='000'):
   if merchant == MERCHANTS['BIG_C']:
-    return f'big_c_product_detail_{date}_000.csv'
+    return f'big_c_product_detail_{date}_{runningNumber}.csv'
   elif merchant == MERCHANTS['MAKRO_PRO']:
-    return f'makro_product_detail_{date}_000.csv'
+    return f'makro_product_detail_{date}_{runningNumber}.csv'
   elif merchant == MERCHANTS['WATSONS']:
-    return f'watsons_product_detail_{date}_000.csv'
+    return f'watsons_product_detail_{date}_{runningNumber}.csv'
   elif merchant == MERCHANTS['TOPS']:
-    return f'tops_product_detail_{date}_000.csv'
+    return f'tops_product_detail_{date}_{runningNumber}.csv'
   elif merchant == MERCHANTS['LOTUSS']:
-    return f'lotuss_product_detail_{date}_000.csv'
+    return f'lotuss_product_detail_{date}_{runningNumber}.csv'
   elif merchant == MERCHANTS['FRESHKET']:
-    return f'freshket_product_detail_{date}_000.csv'
+    return f'freshket_product_detail_{date}_{runningNumber}.csv'
   elif merchant == MERCHANTS['ALLONLINE']:
-    return f'allonline_product_detail_{date}_000.csv'
+    return f'allonline_product_detail_{date}_{runningNumber}.csv'
+
+def generateProductFileName(date, runningNumber='000'):
+  return f'products_{date}_{runningNumber}.csv'
 
 def escapeComma(value):
   if "," in value:
