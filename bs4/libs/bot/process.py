@@ -51,14 +51,15 @@ def getNested(d, keys, default=None):
       return default
   return d
 
-def openChrome(url):
+def openChrome(url, isHeadless):
   options = webdriver.ChromeOptions()
-  options.add_argument('--headless')  # If you want to run Chrome in headless mode
-  options.add_argument('--disable-gpu')  # Required for headless mode to work on Windows
+  if isHeadless == True:
+    options.add_argument('--headless')  # If you want to run Chrome in headless mode
+    options.add_argument('--disable-gpu')  # Required for headless mode to work on Windows
   # options.add_argument("--enable-javascript")
   driver = webdriver.Chrome(options=options) # driver = webdriver.Chrome()
   driver.get(url)
-  time.sleep(10)
+  time.sleep(5)
   content = driver.page_source
   return content
 
@@ -119,7 +120,7 @@ class BotScaper:
         content = response.content
 
         # SECTION 1/2 - open browser and navigate to url wait then for page load
-        # content = openChrome(url)
+        # content = openChrome(url, True)
 
         # SECTION 2 - parse content to beautifulsoup
         soup = BeautifulSoup(content, "html.parser")
@@ -208,7 +209,7 @@ class BotScaper:
       content = response.content
 
       # SECTION 1/2 - open browser and navigate to url wait then for page load
-      # content = openChrome(url)
+      # content = openChrome(url, True)
 
       # SECTION 2 - parse content to beautifulsoup
       soup = BeautifulSoup(content, "html.parser")
@@ -289,7 +290,7 @@ class BotScaper:
     # content = response.content
 
     # SECTION 1/2 - open browser and navigate to url wait then for page load
-    content = openChrome(url)
+    content = openChrome(url, True)
 
     # SECTION 2 - parse content to beautifulsoup
     soup = BeautifulSoup(content, "html.parser")
@@ -340,7 +341,7 @@ class BotScaper:
       # content = response.content
 
       # SECTION 1/2 - open browser and navigate to url wait then for page load
-      content = openChrome(url)
+      content = openChrome(url, False)
 
       # SECTION 2 - parse content to beautifulsoup
       soup = BeautifulSoup(content, "html.parser")
@@ -352,63 +353,52 @@ class BotScaper:
     soup = readContentFromFile("tops-product-detail.html")
 
     # SECTION 5 - EXTRACT
-    sku = ""
-    brand = ""
-    imageUrl = ""
-    name = ""
-    productPriceSale = ""
-    productBasePrice = ""
-    stockStatus = ""
+    next_data_script = soup.find('script', id='__NEXT_DATA__')
+    if next_data_script:
+      json_data_str = next_data_script.string
+      try:
+        next_data_object = json.loads(json_data_str)
+        sku = escapeComma(str(next_data_object['props']['pageProps']['productData']['sku']))
+        brand = escapeComma(str(next_data_object['props']['pageProps']['productData']['brand']))
+        imageUrl = 'https://assets.tops.co.th/' + str(next_data_object['props']['pageProps']['productData']['images'][0]['url'])
+        name = escapeComma(str(next_data_object['props']['pageProps']['productData']['name']))
+        productPriceSale = escapeComma(str(next_data_object['props']['pageProps']['productData']['price']))
+        productBasePrice = getattr(next_data_object['props']['pageProps']['productData'], 'originalPrice', "")
+        stockStatus = escapeComma(str(next_data_object['props']['pageProps']['productData']['stockAvail']))
 
-    elementProductDetailsRoot = soup.find("div", class_="product-Details-page-root")
-    if elementProductDetailsRoot:
-      if elementProductDetailsRoot["data-pdpsku"]:
-        sku = elementProductDetailsRoot["data-pdpsku"]
-      if elementProductDetailsRoot["data-product-brand"]:
-        brand = elementProductDetailsRoot["data-product-brand"]
-      if elementProductDetailsRoot["data-product-image-url"]:
-        imageUrl = elementProductDetailsRoot["data-product-image-url"]
-      if elementProductDetailsRoot["data-product-name"]:
-        name = elementProductDetailsRoot["data-product-name"]
-      if elementProductDetailsRoot["data-product-price-new"]:
-        productPriceSale = elementProductDetailsRoot["data-product-price-new"]
-      if elementProductDetailsRoot["data-stock-status"]:
-        stockStatus = elementProductDetailsRoot["data-stock-status"]
-
-    elementProductDetailsCommonDescription = soup.find("div", class_="product-Details-common-description")
-    elementActualPrice = elementProductDetailsCommonDescription.find("div", class_="product-Details-right-block").find("div", class_="product-Details-price-block").find("span", class_="product-Details-actual-price")
-    if elementActualPrice != None:
-      productBasePrice = elementActualPrice.text.strip()
-
-    # SECTION 6 Load
-    fileName = "tops_product_detail_" + datetime.now().strftime("%Y%m%d") + "_000" + ".csv"
-    header = ','.join(
-      [
-        'createdAt',
-        'name',
-        'brand',
-        'sku',
-        'productPriceSale',
-        'productBasePrice',
-        'imageUrl',
-        'stockStatus',
-        'url'
-      ]
-    ) + '\n'
-    content = ','.join(
-      [
-        datetime.now().isoformat(),
-        name,
-        brand,
-        sku,
-        productPriceSale,
-        productBasePrice,
-        imageUrl,
-        stockStatus,
-        url
-      ]
-    ) + '\n'
-    appendToFile(fileName, header, content)
+        # SECTION 6 Load
+        fileName = "tops_product_detail_" + datetime.now().strftime("%Y%m%d") + "_000" + ".csv"
+        header = ','.join(
+          [
+            'createdAt',
+            'name',
+            'brand',
+            'sku',
+            'productPriceSale',
+            'productBasePrice',
+            'imageUrl',
+            'stockStatus',
+            'url'
+          ]
+        ) + '\n'
+        content = ','.join(
+          [
+            datetime.now().isoformat(),
+            name,
+            brand,
+            sku,
+            productPriceSale,
+            productBasePrice,
+            imageUrl,
+            stockStatus,
+            url
+          ]
+        ) + '\n'
+        appendToFile(fileName, header, content)
+      except Exception as e:
+        print(f'An error occurred: ${e}')
+    else:
+      print("JSON script tag not found using regex.")
 
 
 
@@ -424,7 +414,7 @@ class BotScaper:
     # content = response.content
 
     # SECTION 1/2 - open browser and navigate to url wait then for page load
-    # content = openChrome(url)
+    # content = openChrome(url, True)
 
     # SECTION 2 - parse content to beautifulsoup
     # soup = BeautifulSoup(content, "html.parser")
@@ -489,7 +479,7 @@ class BotScaper:
       content = response.content
 
       # SECTION 1/2 - open browser and navigate to url wait then for page load
-      # content = openChrome(url)
+      # content = openChrome(url, True)
 
       # SECTION 2 - parse content to beautifulsoup
       soup = BeautifulSoup(content, "html.parser")
@@ -553,7 +543,7 @@ class BotScaper:
       content = response.content
 
       # SECTION 1/2 - open browser and navigate to url wait then for page load
-      # content = openChrome(url)
+      # content = openChrome(url, True)
 
       # SECTION 2 - parse content to beautifulsoup
       soup = BeautifulSoup(content, "html.parser")
